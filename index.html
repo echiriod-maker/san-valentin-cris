@@ -46,7 +46,7 @@ body::before{
     pointer-events:auto;
 }
 
-/* ---------- CONTENEDOR FOTOS ---------- */
+/* ---------- CONTENEDOR ---------- */
 .contenedor{
     position:relative;
     width:320px;
@@ -112,7 +112,7 @@ body::before{
 /* ---------- BOTONES SUPERIORES ---------- */
 .boton,.boton-atras,.boton-salir{
     position:fixed;
-    top:25px;
+    top:20px;
     padding:10px 22px;
     border:none;
     border-radius:30px;
@@ -121,8 +121,8 @@ body::before{
     z-index:100;
 }
 
-.boton{right:25px;background:#ff6b6b;color:white;}
-.boton-atras{left:25px;background:white;}
+.boton{right:20px;background:#ff6b6b;color:white;}
+.boton-atras{left:20px;background:white;}
 .boton-salir{
     left:50%;
     transform:translateX(-50%);
@@ -139,7 +139,7 @@ body::before{
 
 <body>
 
-<!-- PANTALLAS -->
+<!-- PANTALLA 1 -->
 <div class="pantalla activa" id="pantalla1">
     <div style="display:flex;gap:80px;flex-wrap:wrap;align-items:center;">
         <div class="contenedor">
@@ -148,10 +148,15 @@ body::before{
             <div class="foto" style="--r:-6deg;top:120px;left:60px"><img src="foto3.jpg"></div>
             <div class="foto" style="--r:10deg;top:160px;left:30px"><img src="foto4.jpg"></div>
         </div>
-        <div class="mensaje">Feliz<br>San Valentín<br>Cris ❤️</div>
+
+        <div class="mensaje">
+            Feliz<br>San Valentín<br>
+            Cris ❤️
+        </div>
     </div>
 </div>
 
+<!-- PANTALLA 2 -->
 <div class="pantalla" id="pantalla2">
     <div class="texto2">
         Gracias por ser mi lugar seguro en todo este tiempo juntos,  
@@ -159,6 +164,7 @@ body::before{
     </div>
 </div>
 
+<!-- PANTALLA 3 -->
 <div class="pantalla" id="pantalla3">
     <div style="display:flex;gap:60px;align-items:center;flex-wrap:wrap;">
         <div class="contenedor">
@@ -166,6 +172,7 @@ body::before{
             <div class="foto final" style="--r:6deg;top:90px;left:20px"><img src="foto7.jpg"></div>
             <div class="foto final" style="--r:-4deg;top:140px;left:60px"><img src="foto8.jpg"></div>
         </div>
+
         <div class="tercera">
             Siempre me haces sentir en casa.<br>
             Esta parte de la canción refleja lo que siento cuando pasamos
@@ -180,8 +187,8 @@ body::before{
 <button class="boton" onclick="siguiente()">Siguiente</button>
 <button class="boton-salir" onclick="salir()">Salir</button>
 
-<!-- MUSICA -->
-<audio id="musica">
+<!-- AUDIO -->
+<audio id="musica" preload="auto">
     <source src="morat-porfa-no-te-vayas.mp3" type="audio/mpeg">
 </audio>
 
@@ -189,29 +196,40 @@ body::before{
 let actual = 1;
 const total = 3;
 
-/* 🎵 MUSICA CON MEMORIA (iPhone OK) */
+/* 🎵 MUSICA – FIX DEFINITIVO iPhone */
 const musica = document.getElementById("musica");
 musica.volume = 0.6;
 
-const tiempoGuardado = localStorage.getItem("tiempoCancion");
-musica.currentTime = tiempoGuardado ? parseFloat(tiempoGuardado) : 155;
+// Esperar a que Safari cargue metadata
+musica.addEventListener("loadedmetadata", () => {
+    const guardado = localStorage.getItem("tiempoCancion");
+    if (guardado !== null) {
+        musica.currentTime = parseFloat(guardado);
+    } else {
+        musica.currentTime = 155; // primera vez
+    }
+});
 
+// Guardar progreso
 musica.addEventListener("timeupdate", () => {
     localStorage.setItem("tiempoCancion", musica.currentTime);
 });
 
-window.addEventListener("pointerdown", () => musica.play(), { once:true });
+// iOS requiere interacción
+window.addEventListener("pointerdown", () => {
+    musica.play();
+}, { once:true });
 
-/* CUANDO TERMINA LA CANCIÓN */
+// Al terminar
 musica.addEventListener("ended", () => {
     localStorage.removeItem("tiempoCancion");
-    alert("Gracias por llegar hasta el final ❤️\nPuedes cerrar esta página.");
+    alert("Gracias por llegar hasta el final ❤️");
 });
 
-/* NAVEGACIÓN */
+/* FOTOS */
 function mostrarFotos(selector){
     document.querySelectorAll(selector).forEach((f,i)=>{
-        setTimeout(()=>f.classList.add("visible"),i*500);
+        setTimeout(()=>f.classList.add("visible"), i*500);
         f.onclick=()=>{
             document.querySelectorAll(selector).forEach(x=>x.classList.remove("activa"));
             f.classList.add("activa");
@@ -220,6 +238,7 @@ function mostrarFotos(selector){
 }
 mostrarFotos("#pantalla1 .foto");
 
+/* NAVEGACIÓN */
 function siguiente(){
     if(actual<total){
         document.getElementById("pantalla"+actual).classList.remove("activa");
@@ -228,6 +247,7 @@ function siguiente(){
         if(actual===3) mostrarFotos("#pantalla3 .foto");
     }
 }
+
 function anterior(){
     if(actual>1){
         document.getElementById("pantalla"+actual).classList.remove("activa");
@@ -236,11 +256,11 @@ function anterior(){
     }
 }
 
-/* SALIR MANUAL */
+/* SALIR */
 function salir(){
     musica.pause();
     localStorage.removeItem("tiempoCancion");
-    window.location.href="about:blank";
+    window.location.href = "about:blank";
 }
 </script>
 
