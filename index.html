@@ -109,7 +109,7 @@ body::before{
     max-width:500px;
 }
 
-/* ---------- BOTONES SUPERIORES ---------- */
+/* ---------- BOTONES ---------- */
 .boton,.boton-atras,.boton-salir{
     position:fixed;
     top:20px;
@@ -196,40 +196,25 @@ body::before{
 let actual = 1;
 const total = 3;
 
-/* 🎵 MÚSICA – EMPIEZA DESDE 0 */
+/* 🎵 MÚSICA DESDE PANTALLA 1 */
 const musica = document.getElementById("musica");
 musica.volume = 0.6;
+let musicaIniciada = false;
 
-// iPhone: esperar metadata
-musica.addEventListener("loadedmetadata", () => {
-    const guardado = localStorage.getItem("tiempoCancion");
-    if (guardado !== null) {
-        musica.currentTime = parseFloat(guardado);
-    } else {
-        musica.currentTime = 0; // ✅ desde el inicio
+// Inicia la música con el PRIMER TOQUE (iPhone compatible)
+document.addEventListener("pointerdown", () => {
+    if(!musicaIniciada){
+        musica.currentTime = 0;
+        musica.play();
+        musicaIniciada = true;
     }
-});
-
-// Guardar progreso
-musica.addEventListener("timeupdate", () => {
-    localStorage.setItem("tiempoCancion", musica.currentTime);
-});
-
-// Reproducción tras toque
-window.addEventListener("pointerdown", () => {
-    musica.play();
 }, { once:true });
-
-// Al terminar
-musica.addEventListener("ended", () => {
-    localStorage.removeItem("tiempoCancion");
-});
 
 /* FOTOS */
 function mostrarFotos(selector){
     document.querySelectorAll(selector).forEach((f,i)=>{
         setTimeout(()=>f.classList.add("visible"), i*500);
-        f.onclick=()=>{
+        f.onclick = () => {
             document.querySelectorAll(selector).forEach(x=>x.classList.remove("activa"));
             f.classList.add("activa");
         };
@@ -239,16 +224,19 @@ mostrarFotos("#pantalla1 .foto");
 
 /* NAVEGACIÓN */
 function siguiente(){
-    if(actual<total){
+    if(actual < total){
         document.getElementById("pantalla"+actual).classList.remove("activa");
         actual++;
         document.getElementById("pantalla"+actual).classList.add("activa");
-        if(actual===3) mostrarFotos("#pantalla3 .foto");
+
+        if(actual === 3){
+            mostrarFotos("#pantalla3 .foto");
+        }
     }
 }
 
 function anterior(){
-    if(actual>1){
+    if(actual > 1){
         document.getElementById("pantalla"+actual).classList.remove("activa");
         actual--;
         document.getElementById("pantalla"+actual).classList.add("activa");
@@ -258,13 +246,14 @@ function anterior(){
 /* SALIR */
 function salir(){
     musica.pause();
-    localStorage.removeItem("tiempoCancion");
+    musica.currentTime = 0;
     window.location.href = "about:blank";
 }
 </script>
 
 </body>
 </html>
+
 
 
 
