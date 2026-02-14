@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Para Cris ❤️</title>
 
+<!-- FUENTES -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 
@@ -46,7 +47,7 @@ body::before{
     pointer-events:auto;
 }
 
-/* ---------- CONTENEDOR ---------- */
+/* ---------- CONTENEDOR FOTOS ---------- */
 .contenedor{
     position:relative;
     width:320px;
@@ -160,7 +161,8 @@ body::before{
 <div class="pantalla" id="pantalla2">
     <div class="texto2">
         Gracias por ser mi lugar seguro en todo este tiempo juntos,  
-        por sacarme sonrisas y por ser tan tú 🥹✨💗
+        por sacarme sonrisas y por ser tan tú
+        🥹✨💗
     </div>
 </div>
 
@@ -182,7 +184,6 @@ body::before{
     </div>
 </div>
 
-<!-- BOTONES -->
 <button class="boton-atras" onclick="anterior()">Atrás</button>
 <button class="boton" onclick="siguiente()">Siguiente</button>
 <button class="boton-salir" onclick="salir()">Salir</button>
@@ -196,25 +197,40 @@ body::before{
 let actual = 1;
 const total = 3;
 
-/* 🎵 MÚSICA DESDE PANTALLA 1 */
+/* 🎵 MÚSICA (ÚNICO CAMBIO REAL) */
 const musica = document.getElementById("musica");
-musica.volume = 0.6;
+musica.volume = .6;
 let musicaIniciada = false;
 
-// Inicia la música con el PRIMER TOQUE (iPhone compatible)
-document.addEventListener("pointerdown", () => {
+// restaurar tiempo si existe
+musica.addEventListener("loadedmetadata",()=>{
+    const t = localStorage.getItem("tiempoCancion");
+    musica.currentTime = t ? parseFloat(t) : 0;
+});
+
+// guardar progreso
+musica.addEventListener("timeupdate",()=>{
+    localStorage.setItem("tiempoCancion", musica.currentTime);
+});
+
+// tocar pantalla en cualquier lugar → reproducir
+window.addEventListener("pointerdown",()=>{
     if(!musicaIniciada){
-        musica.currentTime = 0;
-        musica.play();
+        musica.play().catch(()=>{});
         musicaIniciada = true;
     }
-}, { once:true });
+},{once:true});
+
+// limpiar al terminar
+musica.addEventListener("ended",()=>{
+    localStorage.removeItem("tiempoCancion");
+});
 
 /* FOTOS */
 function mostrarFotos(selector){
     document.querySelectorAll(selector).forEach((f,i)=>{
-        setTimeout(()=>f.classList.add("visible"), i*500);
-        f.onclick = () => {
+        setTimeout(()=>f.classList.add("visible"),i*500);
+        f.onclick=()=>{
             document.querySelectorAll(selector).forEach(x=>x.classList.remove("activa"));
             f.classList.add("activa");
         };
@@ -224,35 +240,32 @@ mostrarFotos("#pantalla1 .foto");
 
 /* NAVEGACIÓN */
 function siguiente(){
-    if(actual < total){
+    if(actual<total){
         document.getElementById("pantalla"+actual).classList.remove("activa");
         actual++;
         document.getElementById("pantalla"+actual).classList.add("activa");
-
-        if(actual === 3){
-            mostrarFotos("#pantalla3 .foto");
-        }
+        if(actual===3) mostrarFotos("#pantalla3 .foto");
     }
 }
 
 function anterior(){
-    if(actual > 1){
+    if(actual>1){
         document.getElementById("pantalla"+actual).classList.remove("activa");
         actual--;
         document.getElementById("pantalla"+actual).classList.add("activa");
     }
 }
 
-/* SALIR */
 function salir(){
     musica.pause();
-    musica.currentTime = 0;
-    window.location.href = "about:blank";
+    localStorage.removeItem("tiempoCancion");
+    window.location.href="about:blank";
 }
 </script>
 
 </body>
 </html>
+
 
 
 
