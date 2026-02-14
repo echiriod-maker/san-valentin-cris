@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Cris ❤️</title>
+
+<!-- FUENTES -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;}
+
+body{
+    margin:0;
+    font-family:'Playfair Display', serif;
+    background:url("fondo.jpg") no-repeat center center/cover;
+    height:100vh;
+    overflow:hidden;
+}
+
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    z-index:-1;
+}
+
+/* ---------- PANTALLAS ---------- */
+.pantalla{
+    position:absolute;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    opacity:0;
+    transform:translateY(20px);
+    transition:.8s;
+    pointer-events:none;
+}
+
+.pantalla.activa{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+}
+
+/* ---------- CONTENEDOR FOTOS ---------- */
+.contenedor{
+    position:relative;
+    width:320px;
+    height:420px;
+}
+
+/* ---------- FOTOS VINTAGE ---------- */
+.foto{
+    position:absolute;
+    width:230px;
+    background:#fdfaf5;
+    padding:14px 14px 30px;
+    border-radius:6px;
+    box-shadow:0 12px 35px rgba(0,0,0,0.6);
+    opacity:0;
+    transform:scale(.85) rotate(var(--r));
+    transition:.6s;
+    cursor:pointer;
+}
+
+.foto img{
+    width:100%;
+    border-radius:3px;
+    filter:sepia(.2) contrast(1.05);
+}
+
+.foto.visible{
+    opacity:1;
+    transform:scale(1) rotate(var(--r));
+}
+
+.foto.activa{
+    z-index:20;
+    transform:scale(1.1) rotate(0deg);
+}
+
+/* ---------- TEXTOS ---------- */
+.mensaje{
+    color:#ff4d4d;
+    font-size:52px;
+    line-height:1.25;
+    text-align:center;
+    text-shadow:0 0 15px rgba(255,255,255,.7),
+                0 0 35px rgba(255,0,0,.6);
+}
+
+/* PANTALLA 2 y 3 - ROMANTIC FONT */
+.texto2, .tercera{
+    font-family:'Great Vibes', cursive;
+    color:#fff0f0;
+    font-size:38px;
+    max-width:650px;
+    text-align:center;
+    padding:30px;
+}
+
+.tercera{
+    font-size:34px;
+    color:white;
+    text-align:left;
+    max-width:500px;
+}
+
+/* ---------- BOTONES ---------- */
+.boton,.boton-atras{
+    position:fixed;
+    bottom:40px;
+    padding:12px 26px;
+    border:none;
+    border-radius:30px;
+    font-size:16px;
+    cursor:pointer;
+}
+
+.boton{right:40px;background:#ff6b6b;}
+.boton-atras{left:40px;background:#fff;}
+
+@media(max-width:768px){
+    .mensaje{font-size:36px;}
+    .texto2,.tercera{font-size:26px;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- PANTALLA 1 -->
+<div class="pantalla activa" id="pantalla1">
+    <div style="display:flex;gap:80px;flex-wrap:wrap;align-items:center;">
+        <div class="contenedor">
+            <div class="foto" style="--r:-10deg;top:40px;left:40px"><img src="foto1.jpg"></div>
+            <div class="foto" style="--r:8deg;top:80px;left:20px"><img src="foto2.jpg"></div>
+            <div class="foto" style="--r:-6deg;top:120px;left:60px"><img src="foto3.jpg"></div>
+            <div class="foto" style="--r:10deg;top:160px;left:30px"><img src="foto4.jpg"></div>
+        </div>
+
+        <div class="mensaje">
+            Feliz<br>San Valentín<br>
+            Cris ❤️
+        </div>
+    </div>
+</div>
+
+<!-- PANTALLA 2 -->
+<div class="pantalla" id="pantalla2">
+    <div class="texto2">
+        Gracias por ser mi lugar seguro en todo este tiempo juntos,  
+        por sacarme sonrisas y por ser tan tú
+        🥹✨💗
+    </div>
+</div>
+
+<!-- PANTALLA 3 -->
+<div class="pantalla" id="pantalla3">
+    <div style="display:flex;gap:60px;align-items:center;flex-wrap:wrap;">
+        <div class="contenedor">
+            <div class="foto final" style="--r:-8deg;top:40px;left:40px"><img src="foto6.jpg"></div>
+            <div class="foto final" style="--r:6deg;top:90px;left:20px"><img src="foto7.jpg"></div>
+            <div class="foto final" style="--r:-4deg;top:140px;left:60px"><img src="foto8.jpg"></div>
+        </div>
+
+        <div class="tercera">
+            Siempre me haces sentir en casa.<br>
+            Esta parte de la canción refleja lo que siento cuando pasamos
+            tiempo juntos.<br>
+            Te quiero ^^
+        </div>
+    </div>
+</div>
+
+<button class="boton-atras" onclick="anterior()">Atrás</button>
+<button class="boton" onclick="siguiente()">Siguiente</button>
+
+<!-- MUSICA -->
+<audio id="musica">
+    <source src="morat-porfa-no-te-vayas.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+let actual=1;
+const total=3;
+
+/* MUSICA */
+const musica=document.getElementById("musica");
+musica.volume=.6;
+musica.addEventListener("loadedmetadata",()=>musica.currentTime=155);
+window.addEventListener("pointerdown",()=>musica.play(),{once:true});
+
+/* MOSTRAR FOTOS */
+function mostrarFotos(selector){
+    const fotos=document.querySelectorAll(selector);
+    fotos.forEach((f,i)=>{
+        setTimeout(()=>f.classList.add("visible"),i*500);
+        f.addEventListener("click",()=>{
+            fotos.forEach(x=>x.classList.remove("activa"));
+            f.classList.add("activa");
+        });
+    });
+}
+mostrarFotos("#pantalla1 .foto");
+
+function siguiente(){
+    if(actual<total){
+        document.getElementById("pantalla"+actual).classList.remove("activa");
+        actual++;
+        document.getElementById("pantalla"+actual).classList.add("activa");
+        if(actual===3) mostrarFotos("#pantalla3 .foto");
+    }
+}
+function anterior(){
+    if(actual>1){
+        document.getElementById("pantalla"+actual).classList.remove("activa");
+        actual--;
+        document.getElementById("pantalla"+actual).classList.add("activa");
+    }
+}
+</script>
+
+</body>
+</html>
+
