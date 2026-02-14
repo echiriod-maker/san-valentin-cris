@@ -196,17 +196,17 @@ body::before{
 let actual = 1;
 const total = 3;
 
-/* 🎵 MUSICA – FIX DEFINITIVO iPhone */
+/* 🎵 MÚSICA – EMPIEZA DESDE 0 */
 const musica = document.getElementById("musica");
 musica.volume = 0.6;
 
-// Esperar a que Safari cargue metadata
+// iPhone: esperar metadata
 musica.addEventListener("loadedmetadata", () => {
     const guardado = localStorage.getItem("tiempoCancion");
     if (guardado !== null) {
         musica.currentTime = parseFloat(guardado);
     } else {
-        musica.currentTime = 155; // primera vez
+        musica.currentTime = 0; // ✅ desde el inicio
     }
 });
 
@@ -215,7 +215,7 @@ musica.addEventListener("timeupdate", () => {
     localStorage.setItem("tiempoCancion", musica.currentTime);
 });
 
-// iOS requiere interacción
+// Reproducción tras toque
 window.addEventListener("pointerdown", () => {
     musica.play();
 }, { once:true });
@@ -223,7 +223,6 @@ window.addEventListener("pointerdown", () => {
 // Al terminar
 musica.addEventListener("ended", () => {
     localStorage.removeItem("tiempoCancion");
-    alert("Gracias por llegar hasta el final ❤️");
 });
 
 /* FOTOS */
@@ -266,5 +265,6 @@ function salir(){
 
 </body>
 </html>
+
 
 
