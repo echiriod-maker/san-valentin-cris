@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Para Cris ❤️</title>
 
-<!-- FUENTES -->
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 
@@ -54,7 +53,7 @@ body::before{
     height:420px;
 }
 
-/* ---------- FOTOS VINTAGE ---------- */
+/* ---------- FOTOS ---------- */
 .foto{
     position:absolute;
     width:230px;
@@ -94,7 +93,6 @@ body::before{
                 0 0 35px rgba(255,0,0,.6);
 }
 
-/* PANTALLA 2 y 3 - ROMANTIC FONT */
 .texto2, .tercera{
     font-family:'Great Vibes', cursive;
     color:#fff0f0;
@@ -111,19 +109,26 @@ body::before{
     max-width:500px;
 }
 
-/* ---------- BOTONES ---------- */
-.boton,.boton-atras{
+/* ---------- BOTONES SUPERIORES ---------- */
+.boton,.boton-atras,.boton-salir{
     position:fixed;
-    bottom:40px;
-    padding:12px 26px;
+    top:25px;
+    padding:10px 22px;
     border:none;
     border-radius:30px;
-    font-size:16px;
+    font-size:15px;
     cursor:pointer;
+    z-index:100;
 }
 
-.boton{right:40px;background:#ff6b6b;}
-.boton-atras{left:40px;background:#fff;}
+.boton{right:25px;background:#ff6b6b;color:white;}
+.boton-atras{left:25px;background:white;}
+.boton-salir{
+    left:50%;
+    transform:translateX(-50%);
+    background:black;
+    color:white;
+}
 
 @media(max-width:768px){
     .mensaje{font-size:36px;}
@@ -134,7 +139,7 @@ body::before{
 
 <body>
 
-<!-- PANTALLA 1 -->
+<!-- PANTALLAS -->
 <div class="pantalla activa" id="pantalla1">
     <div style="display:flex;gap:80px;flex-wrap:wrap;align-items:center;">
         <div class="contenedor">
@@ -143,24 +148,17 @@ body::before{
             <div class="foto" style="--r:-6deg;top:120px;left:60px"><img src="foto3.jpg"></div>
             <div class="foto" style="--r:10deg;top:160px;left:30px"><img src="foto4.jpg"></div>
         </div>
-
-        <div class="mensaje">
-            Feliz<br>San Valentín<br>
-            Cris ❤️
-        </div>
+        <div class="mensaje">Feliz<br>San Valentín<br>Cris ❤️</div>
     </div>
 </div>
 
-<!-- PANTALLA 2 -->
 <div class="pantalla" id="pantalla2">
     <div class="texto2">
         Gracias por ser mi lugar seguro en todo este tiempo juntos,  
-        por sacarme sonrisas y por ser tan tú
-        🥹✨💗
+        por sacarme sonrisas y por ser tan tú 🥹✨💗
     </div>
 </div>
 
-<!-- PANTALLA 3 -->
 <div class="pantalla" id="pantalla3">
     <div style="display:flex;gap:60px;align-items:center;flex-wrap:wrap;">
         <div class="contenedor">
@@ -168,7 +166,6 @@ body::before{
             <div class="foto final" style="--r:6deg;top:90px;left:20px"><img src="foto7.jpg"></div>
             <div class="foto final" style="--r:-4deg;top:140px;left:60px"><img src="foto8.jpg"></div>
         </div>
-
         <div class="tercera">
             Siempre me haces sentir en casa.<br>
             Esta parte de la canción refleja lo que siento cuando pasamos
@@ -178,8 +175,10 @@ body::before{
     </div>
 </div>
 
+<!-- BOTONES -->
 <button class="boton-atras" onclick="anterior()">Atrás</button>
 <button class="boton" onclick="siguiente()">Siguiente</button>
+<button class="boton-salir" onclick="salir()">Salir</button>
 
 <!-- MUSICA -->
 <audio id="musica">
@@ -187,24 +186,36 @@ body::before{
 </audio>
 
 <script>
-let actual=1;
-const total=3;
+let actual = 1;
+const total = 3;
 
-/* MUSICA */
-const musica=document.getElementById("musica");
-musica.volume=.6;
-musica.addEventListener("loadedmetadata",()=>musica.currentTime=155);
-window.addEventListener("pointerdown",()=>musica.play(),{once:true});
+/* 🎵 MUSICA CON MEMORIA (iPhone OK) */
+const musica = document.getElementById("musica");
+musica.volume = 0.6;
 
-/* MOSTRAR FOTOS */
+const tiempoGuardado = localStorage.getItem("tiempoCancion");
+musica.currentTime = tiempoGuardado ? parseFloat(tiempoGuardado) : 155;
+
+musica.addEventListener("timeupdate", () => {
+    localStorage.setItem("tiempoCancion", musica.currentTime);
+});
+
+window.addEventListener("pointerdown", () => musica.play(), { once:true });
+
+/* CUANDO TERMINA LA CANCIÓN */
+musica.addEventListener("ended", () => {
+    localStorage.removeItem("tiempoCancion");
+    alert("Gracias por llegar hasta el final ❤️\nPuedes cerrar esta página.");
+});
+
+/* NAVEGACIÓN */
 function mostrarFotos(selector){
-    const fotos=document.querySelectorAll(selector);
-    fotos.forEach((f,i)=>{
+    document.querySelectorAll(selector).forEach((f,i)=>{
         setTimeout(()=>f.classList.add("visible"),i*500);
-        f.addEventListener("click",()=>{
-            fotos.forEach(x=>x.classList.remove("activa"));
+        f.onclick=()=>{
+            document.querySelectorAll(selector).forEach(x=>x.classList.remove("activa"));
             f.classList.add("activa");
-        });
+        };
     });
 }
 mostrarFotos("#pantalla1 .foto");
@@ -224,8 +235,16 @@ function anterior(){
         document.getElementById("pantalla"+actual).classList.add("activa");
     }
 }
+
+/* SALIR MANUAL */
+function salir(){
+    musica.pause();
+    localStorage.removeItem("tiempoCancion");
+    window.location.href="about:blank";
+}
 </script>
 
 </body>
 </html>
+
 
